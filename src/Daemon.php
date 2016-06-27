@@ -1,12 +1,13 @@
 <?php
-use Epoque\GitHub;
+namespace Epoque\GitHub;
 
 
 class Daemon
 {
     private static $config = [
-        'user'  => '',
-        'token' => ''
+        'user'       => '',
+        'token'      => '',
+        'user-agent' => 'Googlebot/2.1 (+http://www.google.com/bot.html)'
     ];
 
 
@@ -22,7 +23,10 @@ class Daemon
     public static function init($spec=[])
     {
         foreach (self::$config as $key => $v) {
-            self::$config[$key] = '';
+            if ($key === 'user-agent')
+                self::$config[$key] = 'Googlebot/2.1 (+http://www.google.com/bot.html)';
+            else
+                self::$config[$key] = '';
         }
         
         self::config($spec);
@@ -44,6 +48,32 @@ class Daemon
                 self::$config[$key] = $spec[$key];
             }
         }
+    }
+    
+    
+    /**
+     * query
+     * 
+     * Prepare and send a query to the GitHub API.
+     * 
+     * @param string $url The API URL to use.
+     */
+    
+    public static function query($url)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_USERAGENT, self::$config['user-agent']);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($curl, CURLOPT_USERPWD, self::$config['user'].':'.self::$config['token']);
+        curl_setopt($curl, CURLOPT_URL, $url);
+
+        $result = curl_exec($curl);
+        $result = trim(rtrim(ltrim($result, '['), ']'));
+        $result = trim(rtrim(ltrim($result, '{'), '}'));
+        $result = explode('},{', $result);
+        $result[count($result)-1] = $result[count($result)-1] . '}';
+        
+        return $result;
     }
 }
 
