@@ -2,6 +2,7 @@
 
 namespace Epoque\GitHub;
 use Epoque\GitHub\Daemon;
+use Epoque\GitHub\QueryBuilder;
 
 
 /**
@@ -10,8 +11,8 @@ use Epoque\GitHub\Daemon;
  * @author jason favrod <jason@epoquecorportation.com>
  */
 
-class Repos
-{
+class Repos extends QueryBuilder
+{   
     /**
      * enumerate
      * 
@@ -28,12 +29,7 @@ class Repos
         $repos = [];
         $url = 'https://api.github.com/user/repos';
         
-        if (!empty($params)) {
-            foreach ($params as $param => $value) {
-                $url .= "?$param=$value";
-            }
-        }
-        
+        self::buildQuery($url, $params);
         $queryResult = Daemon::query($url);
         
         foreach ($queryResult as $repo) {
