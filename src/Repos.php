@@ -27,7 +27,7 @@ class Repos extends QueryBuilder
     public static function enumerate($params=[])
     {
         $repos = [];
-        $url = 'https://api.github.com/user/repos';
+        $url = Daemon::$config['url'].'user/repos';
         
         self::buildQuery($url, $params);
         $queryResult = Daemon::query($url);
@@ -37,5 +37,33 @@ class Repos extends QueryBuilder
         }
         
         return $repos;
+    }
+
+
+    /**
+     * branches
+     * 
+     * Return an array of branches of the given repo.
+     * 
+     * @param string $repo The name of the given repo.
+     * @param array
+     * 
+     * @return array Contains the branches as StdObjects.
+     */
+    
+    public static function branches($repo, $params=[])
+    {
+        $branches = [];
+        $url = Daemon::$config['url'] . 'repos/';
+        $url .= Daemon::$config['user'] . "/$repo/branches";
+        
+        self::buildQuery($url, $params);
+        $queryResult = Daemon::query($url);
+        
+        foreach ($queryResult as $branch) {
+            array_push($branches, json_decode("{ $branch }"));
+        }
+        
+        return $branches;
     }
 }
