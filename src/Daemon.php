@@ -4,11 +4,15 @@ namespace Epoque\GitHub;
 
 class Daemon
 {
-    private static $config = [
+    public static $defaults = [
+        'url'       => 'https://api.github.com/',
         'user'       => '',
         'token'      => '',
         'user-agent' => 'Googlebot/2.1 (+http://www.google.com/bot.html)'
     ];
+
+
+    public static $config = [];
 
 
     /**
@@ -22,35 +26,18 @@ class Daemon
     
     public static function init($spec=[])
     {
-        foreach (self::$config as $key => $v) {
-            if ($key === 'user-agent')
-                self::$config[$key] = 'Googlebot/2.1 (+http://www.google.com/bot.html)';
-            else
-                self::$config[$key] = '';
+        foreach (self::$defaults as $key => $val) {
+            self::$config[$key] = $val;
         }
         
-        self::config($spec);
-    }
-
-    
-    /**
-     * config
-     * 
-     * Configures the Dameon object according to a given spec.
-     * 
-     * @param assoc_array $spec 
-     */
-    
-    public static function config($spec=[])
-    {  
-        foreach (self::$config  as $key => $v) {
-            if (array_key_exists($key, $spec)) {
-                self::$config[$key] = $spec[$key];
+        foreach ($spec as $key => $val) {
+            if (array_key_exists($key, self::$config)) {
+                self::$config[$key] = $val;
             }
         }
     }
-    
-    
+
+
     /**
      * query
      * 
@@ -58,7 +45,7 @@ class Daemon
      * 
      * @param string $url The API URL to use.
      */
-    
+
     public static function query($url)
     {
         $curl = curl_init();
@@ -76,4 +63,3 @@ class Daemon
         return $result;
     }
 }
-
