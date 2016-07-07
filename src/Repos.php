@@ -66,4 +66,17 @@ class Repos extends QueryBuilder
         
         return $branches;
     }
+
+
+    public static function commits($repo='', $params=[])
+    {
+        $commits = [];
+        $url = Daemon::$config['url'] . 'repos/';
+        $url .= Daemon::$config['user'] . "/$repo/commits";
+        
+        self::buildQuery($url, $params);
+        $queryResult = Daemon::query($url);
+        
+        return $queryResult;
+    }
 }
